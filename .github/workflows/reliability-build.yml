@@ -2,10 +2,10 @@ name: ReliabilityBuild
 on:
   workflow_dispatch:
 jobs:
-  hc-build:
+  reliability-build:
     runs-on: ubuntu-latest
     container:
-      image: dockbuild/ubuntu1604-gcc7:latest
+      image: dockbuild/ubuntu1604:latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4

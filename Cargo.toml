@@ -1,0 +1,9 @@
+[workspace]
+members = [
+  "reliability",
+]
+resolver = "2"
+
+[workspace.dependencies]
+eframe = "0.29.1"
+egui_extras = { version = "0.29.1", features = ["image"] }

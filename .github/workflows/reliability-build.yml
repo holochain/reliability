@@ -8,10 +8,7 @@ jobs:
       image: dockbuild/ubuntu1604:latest
     steps:
       - name: Checkout code
-        run: |
-          git clone ${{ github.repositoryUrl }}
-          cd reliability
-          git checkout ${{ github.ref }}
+        run: git clone --depth=1 https://github.com/holochain/reliability.git
 
       - name: Print Glibc Version
         run: ldd --version ldd

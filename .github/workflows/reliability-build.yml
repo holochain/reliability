@@ -1,33 +1,34 @@
-name: ReliabilityBuild
+name: ReliabilityReleaseLinuxX64
 on:
   workflow_dispatch:
 jobs:
-  reliability-build:
+  reliability-release-linux-x64:
     runs-on: ubuntu-latest
     container:
       image: dockbuild/ubuntu1604:latest
     steps:
-      #      - name: Checkout code
-      #        run: git clone --depth=1 https://github.com/holochain/reliability.git
-
-      #      - name: Print Glibc Version
-      # run: ldd --version ldd
-
-          #      - name: Install Rust
-          #        run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --profile minimal -y
-
-          #      - name: Build reliability
-          #        run: |
-          #          cd reliability
-          #          PATH=~/.cargo/bin:$(pwd)/go/bin:$PATH cargo build --release
-
-          #      - name: Print reliability ldd
-          #        run: ldd reliability/target/release/reliability
-
-      - name: install jq
+      - name: Install Tools
         run: |
           apt update
-          apt install -y jq
+          apt install -y jq zip
+
+      - name: Checkout code
+        run: git clone --depth=1 https://github.com/holochain/reliability.git
+
+      - name: Print Glibc Version
+        run: ldd --version ldd
+
+      - name: Install Rust
+        run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --profile minimal -y
+
+      - name: Build reliability
+        run: |
+          cd reliability
+          PATH=~/.cargo/bin:$(pwd)/go/bin:$PATH cargo build --release
+          zip reliability-linux-x64-v0.0.1.zip reliability/target/release/reliability
+
+      - name: Print reliability ldd
+        run: ldd reliability/target/release/reliability
 
       - name: Create Release
         id: create_release
@@ -41,5 +42,4 @@ jobs:
 
       - name: Upload Artifact
         run: |
-          echo "test" > bob.txt
-          curl -L -X POST -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ github.token }}" -H "X-GitHub-Api-Version: 2022-11-28" -H "Content-Type: application/octet-stream" "https://uploads.github.com/repos/holochain/reliability/releases/${{ steps.create_release.outputs.release_id }}/assets?name=bob.txt" --data-binary "@bob.txt"
+          curl -L -X POST -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ github.token }}" -H "X-GitHub-Api-Version: 2022-11-28" -H "Content-Type: application/octet-stream" "https://uploads.github.com/repos/holochain/reliability/releases/${{ steps.create_release.outputs.release_id }}/assets?name=reliability-linux-x64-v0.0.1.zip" --data-binary "@reliability-linux-x64-v0.0.1.zip"

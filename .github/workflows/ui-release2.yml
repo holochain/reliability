@@ -8,16 +8,31 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build Docker Image
-        uses: docker/build-push-action@v3
-        with:
-          tags: dockbuildrust:latest
-          context: docker/ui-release
-          push: false
+          #      - name: Build Docker Image
+          #        uses: docker/build-push-action@v3
+          #        with:
+          #          tags: dockbuildrust:latest
+          #          context: docker/ui-release
+          #          push: false
 
-      - name: Build Executable
-        uses: addnab/docker-run-action@v3
-        with:
-          image: dockbuildrust:latest
-          options: -v ${{ github.workspace }}:/work
-          run: /root/.cargo/bin/cargo build --release --manifest-path hc-reliability-ui/Cargo.toml
+          #      - name: Build Executable
+          #        uses: addnab/docker-run-action@v3
+          #        with:
+          #          image: dockbuildrust:latest
+          #          options: -v ${{ github.workspace }}:/work
+          #          run: /root/.cargo/bin/cargo build --release --manifest-path hc-reliability-ui/Cargo.toml
+
+    - name: Barf
+      run: |
+        mkdir -p target/release
+        echo "barf" > target/release/hc-reliability-ui
+
+    - name: Publish Release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: target/release/hc-reliability-ui
+        asset_name: hc-reliability-ui
+        tag: ${{ github.ref }}
+        overwrite: true
+        body: "hc-reliability-ui"

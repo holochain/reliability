@@ -1,10 +1,9 @@
 // hide console window on Windows in release
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-#[cfg(windows)]
-const VERSION: &str = include_str!(concat!(env!("OUT_DIR"), "\\version.txt"));
-#[cfg(not(windows))]
 const VERSION: &str = include_str!(concat!(env!("OUT_DIR"), "/version.txt"));
+const ARCH: &str = include_str!(concat!(env!("OUT_DIR"), "/arch.txt"));
+const OS: &str = include_str!(concat!(env!("OUT_DIR"), "/os.txt"));
 
 mod update;
 

@@ -1,3 +1,10 @@
+use crate::*;
+
+const APP_INFO: app_dirs2::AppInfo = app_dirs2::AppInfo {
+    name: "hc-reliability",
+    author: "holochain",
+};
+
 #[derive(Debug, serde::Deserialize)]
 struct Asset {
     pub browser_download_url: String,
@@ -11,18 +18,25 @@ struct Release {
 }
 
 pub fn try_update(cur: semver::Version) -> Option<std::path::PathBuf> {
-    let releases = ureq::get(
+    let releases = match ureq::get(
         "https://api.github.com/repos/holochain/reliability/releases",
     )
     .set("Accept", "application/vnd.github+json")
     .set("X-GitHub-Api-Version", "2022-11-28")
-    .call()
-    .expect("Failed to call github releases api")
-    .into_string()
-    .expect("Failed to parse github releases api response");
+    .call() {
+        Ok(releases) => releases,
+        _ => return None,
+    };
 
-    let releases: Vec<Release> = serde_json::from_str(&releases)
-        .expect("Failed to parse github releases api response json");
+    let releases = match releases.into_string() {
+        Ok(releases) => releases,
+        _ => return None,
+    };
+
+    let releases: Vec<Release> = match serde_json::from_str(&releases) {
+        Ok(releases) => releases,
+        _ => return None,
+    };
 
     let release = match releases
         .into_iter()
@@ -37,10 +51,13 @@ pub fn try_update(cur: semver::Version) -> Option<std::path::PathBuf> {
             None => return None,
         };
 
+    let want_asset = format!("hc-reliability-{OS}-{ARCH}-v{VERSION}.zip");
+    println!("looking for asset {want_asset}");
+
     let asset = match release
         .assets
         .into_iter()
-        .filter(|a| a.name == "hc-reliability")
+        .filter(|a| a.name == want_asset)
         .next() {
             Some(asset) => asset,
             None => return None,
@@ -53,9 +70,16 @@ pub fn try_update(cur: semver::Version) -> Option<std::path::PathBuf> {
         .expect("Failed to download hc-reliability")
         .into_reader();
 
+    let cache = app_dirs2::get_app_dir(app_dirs2::AppDataType::UserCache, &APP_INFO, "updates").unwrap_or_else(|_| std::env::current_dir().unwrap());
+
+    let _ = std::fs::create_dir_all(&cache);
+    let zip = cache.join(want_asset);
+
+    println!("{zip:?}");
     let mut file = std::fs::OpenOptions::new()
         .write(true)
-        .open("hc-reliability")
+        .create(true)
+        .open(zip)
         .unwrap();
 
     std::io::copy(&mut asset, &mut file).unwrap();

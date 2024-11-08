@@ -25,7 +25,8 @@ jobs:
         run: |
           cd reliability
           PATH=~/.cargo/bin:$(pwd)/go/bin:$PATH cargo build --release
-          zip reliability-linux-x64-v0.0.1.zip reliability/target/release/reliability
+          cp target/release/reliability .
+          zip ../reliability-linux-x64-v0.0.1.zip reliability
 
       - name: Print reliability ldd
         run: ldd reliability/target/release/reliability

@@ -1,0 +1,53 @@
+name: UiReleaseLinuxX64
+on:
+  workflow_dispatch:
+jobs:
+  ui-release-linux-x64:
+    runs-on: ubuntu-latest
+    container:
+      image: dockbuild/ubuntu1604:latest
+    steps:
+      - name: Install Tools
+        run: |
+          apt update
+          apt install -y jq zip
+
+      - name: Checkout code
+        run: git clone --depth=1 https://github.com/holochain/reliability.git
+
+      - name: Determine Values
+        id: determine_values
+        run: |
+          VER=$(grep version reliability/hc-reliability-ui/Cargo.toml | cut -c 12-16)
+          echo SETTING VERSION ${VER}
+          echo "release_ver=${VER}\n" >> $GITHUB_OUTPUT
+
+      - name: Print Glibc Version
+        run: ldd --version ldd
+
+      - name: Install Rust
+        run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --profile minimal -y
+
+      - name: Build hc-reliability-ui
+        run: |
+          cd reliability
+          PATH=~/.cargo/bin:$(pwd)/go/bin:$PATH cargo build --release --manifest-path hc-reliability-ui/Cargo.toml
+          cd target/release
+          zip ../../../hc-reliability-ui-linux-x64-v${{ steps.determine_values.outputs.release_ver }}.zip hc-reliability-ui
+
+      - name: Print reliability ldd
+        run: ldd reliability/target/release/hc-reliability-ui
+
+      - name: Create Release
+        id: create_release
+        run: |
+          curl -L -X POST -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ github.token }}" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/repos/holochain/reliability/releases -d '{"tag_name":"v${{ steps.determine_values.outputs.release_ver }}","target_commitish":"main","name":"v${{ steps.determine_values.outputs.release_ver }}","body":"Release v${{ steps.determine_values.outputs.release_ver }}","draft":false,"prerelease":false,"generate_release_notes":false}' | tee release.json
+          cat release.json | jq .id > release.id
+          echo PRINTING RELEASE ID
+          cat release.id
+          echo PRINTED RELEASE ID
+          echo "release_id=$(cat release.id)\n" >> $GITHUB_OUTPUT
+
+      - name: Upload Artifact
+        run: |
+          curl -L -X POST -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ github.token }}" -H "X-GitHub-Api-Version: 2022-11-28" -H "Content-Type: application/octet-stream" "https://uploads.github.com/repos/holochain/reliability/releases/${{ steps.create_release.outputs.release_id }}/assets?name=reliability-linux-x64-v${{ steps.determine_values.outputs.release_ver }}.zip" --data-binary "@reliability-linux-x64-v${{ steps.determine_values.outputs.release_ver }}.zip"

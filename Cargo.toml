@@ -1,6 +1,6 @@
 [workspace]
 members = [
-  "reliability",
+  "hc-reliability-ui",
 ]
 resolver = "2"
 

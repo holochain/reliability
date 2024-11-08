@@ -22,6 +22,13 @@ jobs:
           #          options: -v ${{ github.workspace }}:/work
           #          run: /root/.cargo/bin/cargo build --release --manifest-path hc-reliability-ui/Cargo.toml
 
+      - name: Version
+        id: version
+        run: |
+          VER=$(grep version hc-reliability-ui/Cargo.toml | cut -d '"' -f 2)
+          echo SETTING VERSION ${VER}
+          echo "version=${VER}\n" >> $GITHUB_OUTPUT
+
       - name: Barf
         run: |
           mkdir -p target/release
@@ -33,6 +40,6 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/release/hc-reliability-ui
           asset_name: hc-reliability-ui
-          tag: ${{ github.ref }}
+          tag: v${{ steps.version.outputs.version }}
           overwrite: true
           body: "hc-reliability-ui"

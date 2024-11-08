@@ -1,14 +1,14 @@
-[workspace]
-members = [
-  "hc-reliability",
-  "hc-reliability-ui",
-]
+[package]
+name = "hc-reliability"
+version = "0.0.1"
+edition = "2021"
 resolver = "2"
 
-[workspace.dependencies]
+[dependencies]
+app_dirs2 = "2.5.5"
 eframe = "0.29.1"
 egui_extras = { version = "0.29.1", features = ["image"] }
-regex = "1.11.1"
+semver = "1.0.23"
 serde = { version = "1.0.214", features = ["derive"] }
 serde_json = { version = "1.0.132" }
 ureq = "2.10.1"

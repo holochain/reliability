@@ -1,8 +1,8 @@
-name: UiReleaseLinuxX64
+name: ReleaseLinuxX64
 on:
   workflow_dispatch:
 jobs:
-  ui-release-linux-x64:
+  release-linux-x64:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -11,7 +11,7 @@ jobs:
       - name: Version
         id: version
         run: |
-          VER=$(grep version hc-reliability-ui/Cargo.toml | cut -d '"' -f 2)
+          VER=$(grep version Cargo.toml | cut -d '"' -f 2)
           echo SETTING VERSION ${VER}
           echo "version=${VER}" >> $GITHUB_OUTPUT
 
@@ -27,14 +27,14 @@ jobs:
         with:
           image: dockbuildrust:latest
           options: -v ${{ github.workspace }}:/work
-          run: /root/.cargo/bin/cargo build --release --manifest-path hc-reliability-ui/Cargo.toml
+          run: /root/.cargo/bin/cargo build --release
 
       - name: Publish Release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/release/hc-reliability-ui
-          asset_name: hc-reliability-ui
-          tag: "hc-reliability-ui-v${{ steps.version.outputs.version }}"
+          file: target/release/hc-reliability
+          asset_name: hc-reliability
+          tag: "hc-reliability-v${{ steps.version.outputs.version }}"
           overwrite: true
-          body: "hc-reliability-ui release v${{ steps.version.outputs.version }}"
+          body: "hc-reliability release v${{ steps.version.outputs.version }}"

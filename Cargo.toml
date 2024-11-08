@@ -1,5 +1,6 @@
 [workspace]
 members = [
+  "hc-reliability",
   "hc-reliability-ui",
 ]
 resolver = "2"
@@ -7,3 +8,7 @@ resolver = "2"
 [workspace.dependencies]
 eframe = "0.29.1"
 egui_extras = { version = "0.29.1", features = ["image"] }
+regex = "1.11.1"
+serde = { version = "1.0.214", features = ["derive"] }
+serde_json = { version = "1.0.132" }
+ureq = "2.10.1"

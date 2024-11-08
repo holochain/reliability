@@ -1,0 +1,21 @@
+name: UiRelease2LinuxX64
+on:
+  workflow_dispatch:
+jobs:
+  ui-release-2-linux-x64:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Rust Toolchain
+        run: |
+          rustup toolchain install stable --profile minimal --no-self-update
+          rustup default stable
+
+      - name: Build Docker Image
+        uses: docker/build-push-action@v3
+          with:
+            tags: dockbuildrust:latest
+            context: docker/ui-release
+            push: false

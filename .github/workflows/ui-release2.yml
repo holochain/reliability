@@ -15,7 +15,7 @@ jobs:
 
       - name: Build Docker Image
         uses: docker/build-push-action@v3
-          with:
-            tags: dockbuildrust:latest
-            context: docker/ui-release
-            push: false
+        with:
+          tags: dockbuildrust:latest
+          context: docker/ui-release
+          push: false

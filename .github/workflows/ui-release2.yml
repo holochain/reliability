@@ -40,6 +40,6 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/release/hc-reliability-ui
           asset_name: hc-reliability-ui
-          tag: v${{ steps.version.outputs.version }}
+          tag: "hc-reliability-ui-v${{ steps.version.outputs.version }}"
           overwrite: true
-          body: "hc-reliability-ui"
+          body: "hc-reliability-ui release v${{ steps.version.outputs.version }}"

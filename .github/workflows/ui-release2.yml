@@ -27,7 +27,7 @@ jobs:
         run: |
           VER=$(grep version hc-reliability-ui/Cargo.toml | cut -d '"' -f 2)
           echo SETTING VERSION ${VER}
-          echo "version=${VER}\n" >> $GITHUB_OUTPUT
+          echo "version=${VER}" >> $GITHUB_OUTPUT
 
       - name: Barf
         run: |

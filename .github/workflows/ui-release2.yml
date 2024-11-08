@@ -22,17 +22,17 @@ jobs:
           #          options: -v ${{ github.workspace }}:/work
           #          run: /root/.cargo/bin/cargo build --release --manifest-path hc-reliability-ui/Cargo.toml
 
-    - name: Barf
-      run: |
-        mkdir -p target/release
-        echo "barf" > target/release/hc-reliability-ui
+      - name: Barf
+        run: |
+          mkdir -p target/release
+          echo "barf" > target/release/hc-reliability-ui
 
-    - name: Publish Release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: target/release/hc-reliability-ui
-        asset_name: hc-reliability-ui
-        tag: ${{ github.ref }}
-        overwrite: true
-        body: "hc-reliability-ui"
+      - name: Publish Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/release/hc-reliability-ui
+          asset_name: hc-reliability-ui
+          tag: ${{ github.ref }}
+          overwrite: true
+          body: "hc-reliability-ui"

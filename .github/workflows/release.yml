@@ -30,8 +30,14 @@ jobs:
           run: |
             /root/.cargo/bin/cargo build --release
             cd target/release
-            mv hc-reliability hc-reliability-linux-x64-${{ steps.version.outputs.version }}
-            zip ../../hc-reliability-linux-x64-${{ steps.version.outputs.version }}.zip hc-reliability-linux-x64-${{ steps.version.outputs.version }}
+            mv hc-reliability ../../hc-reliability-linux-x64-${{ steps.version.outputs.version }}
+
+      - name: Zip Executable
+        uses: thedoctor0/zip-release@0.7.5
+        with:
+          type: zip
+          filename: hc-reliability-linux-x64-${{ steps.version.outputs.version }}.zip
+          path: hc-reliability-linux-x64-${{ steps.version.outputs.version }}
 
       - name: Publish Release
         uses: svenstaro/upload-release-action@v2

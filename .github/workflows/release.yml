@@ -11,7 +11,7 @@ jobs:
       - name: Version
         id: version
         run: |
-          VER=$(grep version Cargo.toml | cut -d '"' -f 2)
+          VER=$(grep version Cargo.toml | head -1 | cut -d '"' -f 2)
           echo SETTING VERSION ${VER}
           echo "version=${VER}" >> $GITHUB_OUTPUT
 
@@ -27,14 +27,18 @@ jobs:
         with:
           image: dockbuildrust:latest
           options: -v ${{ github.workspace }}:/work
-          run: /root/.cargo/bin/cargo build --release
+          run: |
+            /root/.cargo/bin/cargo build --release
+            cd target/release
+            mv hc-reliability hc-reliability-linux-x64-${{ steps.version.outputs.version }}
+            zip ../../hc-reliability-linux-x64-${{ steps.version.outputs.version }}.zip hc-reliability-linux-x64-${{ steps.version.outputs.version }}
 
       - name: Publish Release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/release/hc-reliability
+          file: hc-reliability-linux-x64-${{ steps.version.outputs.version }}.zip
           asset_name: hc-reliability
-          tag: "hc-reliability-v${{ steps.version.outputs.version }}"
+          tag: "v${{ steps.version.outputs.version }}"
           overwrite: true
           body: "hc-reliability release v${{ steps.version.outputs.version }}"

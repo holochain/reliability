@@ -1,8 +1,8 @@
-name: ReleaseLinuxX64
+name: release-linux-x86_64
 on:
   workflow_dispatch:
 jobs:
-  release-linux-x64:
+  release-linux-x86_64:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -30,21 +30,21 @@ jobs:
           run: |
             /root/.cargo/bin/cargo build --release
             cd target/release
-            mv hc-reliability ../../hc-reliability-linux-x64-${{ steps.version.outputs.version }}
+            mv hc-reliability ../../hc-reliability-linux-x86_64-${{ steps.version.outputs.version }}
 
       - name: Zip Executable
         uses: thedoctor0/zip-release@0.7.5
         with:
           type: zip
-          filename: hc-reliability-linux-x64-${{ steps.version.outputs.version }}.zip
-          path: hc-reliability-linux-x64-${{ steps.version.outputs.version }}
+          filename: hc-reliability-linux-x86_64-${{ steps.version.outputs.version }}.zip
+          path: hc-reliability-linux-x86_64-${{ steps.version.outputs.version }}
 
       - name: Publish Release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: hc-reliability-linux-x64-${{ steps.version.outputs.version }}.zip
-          asset_name: hc-reliability
+          file: hc-reliability-linux-x86_64-${{ steps.version.outputs.version }}.zip
+          asset_name: hc-reliability-linux-x86_64-${{ steps.version.outputs.version }}.zip
           tag: "v${{ steps.version.outputs.version }}"
           overwrite: true
           body: "hc-reliability release v${{ steps.version.outputs.version }}"

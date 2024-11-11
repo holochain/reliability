@@ -42,7 +42,7 @@ pub fn try_update(cur: semver::Version) -> Option<std::path::PathBuf> {
         .into_iter()
         .filter(|r| {
             match semver::Version::parse(&r.tag_name) {
-                Ok(v) => v > cur,
+                Ok(v) => true, //v > cur,
                 _ => false
             }
         })
@@ -77,6 +77,7 @@ pub fn try_update(cur: semver::Version) -> Option<std::path::PathBuf> {
 
     println!("{zip:?}");
     let mut file = std::fs::OpenOptions::new()
+        .read(true)
         .write(true)
         .create(true)
         .open(zip)
@@ -84,6 +85,7 @@ pub fn try_update(cur: semver::Version) -> Option<std::path::PathBuf> {
 
     std::io::copy(&mut asset, &mut file).unwrap();
 
+    /*
     #[cfg(unix)]
     {
         let meta = file.metadata().unwrap();
@@ -92,9 +94,17 @@ pub fn try_update(cur: semver::Version) -> Option<std::path::PathBuf> {
         perm.set_mode(0o755);
         file.set_permissions(perm).unwrap();
     }
+    */
 
     drop(asset);
-    drop(file);
+
+    use std::io::Seek;
+    file.rewind().unwrap();
+
+    let mut archive = zip::ZipArchive::new(file).unwrap();
+    archive.extract(cache).unwrap();
+
+    drop(archive);
 
     //assert!(std::process::Command::new("./hc-reliability").status().unwrap().success());
 
